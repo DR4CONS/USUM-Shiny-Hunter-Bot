@@ -20,7 +20,6 @@ public class ShinyBotConfig extends Config {
     private boolean hasShinyCharm = false;
     private String profileName = "New Profile";
     private int minimumDelay = 500;
-    private int attempts = 0;
     private int[] encounterColor = new int[3];
     private int[] battleColor = new int[3];
     
@@ -39,7 +38,6 @@ public class ShinyBotConfig extends Config {
                 hasShinyCharm = settings.getBoolean("hasShinyCharm");
                 minimumDelay = settings.getInt("minimumDelay");
                 controllerNum = settings.getInt("controllerNum");
-                attempts = settings.getInt("attempts");
 
                 JSONArray colorNums = settings.getJSONArray("encounterColor");
                 for (int i = 0; i < 3; i++) {
@@ -69,7 +67,6 @@ public class ShinyBotConfig extends Config {
         settings.put("encounterColor", encounterColor);
         settings.put("battleColor", battleColor);
         settings.put("controllerNum", controllerNum);
-        settings.put("attempts", attempts);
 
         writeSettings(new File("Shinybot/profiles/"), filename, settings);
     }
@@ -199,12 +196,6 @@ public class ShinyBotConfig extends Config {
                 battleColor[2] = value;
             }
         }
-    }
-    public int getAttempts() {
-        return attempts;
-    }
-    public void setAttempts(int attempts) {
-        this.attempts = attempts;
     }
     public int getControllerNum() {
         return controllerNum;

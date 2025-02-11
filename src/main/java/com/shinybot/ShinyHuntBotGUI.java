@@ -62,7 +62,7 @@ public class ShinyHuntBotGUI {
 
         // create main frame
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 420); //heh
+        frame.setSize(600, 420); // heh
 
         // Create the main panel with vertical BoxLayout
         JPanel mainPanel = new JPanel();
@@ -83,7 +83,11 @@ public class ShinyHuntBotGUI {
         // profile selector
         leftLabels[0].setText("Profile:  ");
         leftPanels[0].add(leftLabels[0]);
-        currentProfile = new JComboBox<>(new DefaultComboBoxModel<>(ShinyBotConfig.getProfiles())); // list of profiles derived from .json files in the save directory
+        currentProfile = new JComboBox<>(new DefaultComboBoxModel<>(ShinyBotConfig.getProfiles())); // list of profiles
+                                                                                                    // derived from
+                                                                                                    // .json files in
+                                                                                                    // the save
+                                                                                                    // directory
         currentProfile.setSelectedItem(config.getCurrentProfile());
         currentProfile.setMaximumSize(new Dimension(200, 25)); // max size of selector box
         currentProfile.setPreferredSize(new Dimension(200, 25));
@@ -98,7 +102,10 @@ public class ShinyHuntBotGUI {
 
         // selector for screen to monitor
         leftPanels[0].add(new JLabel("     Screen:   "));
-        windows = new JComboBox<>(new DefaultComboBoxModel<>(WindowColorMonitor.getOpenWindowTitles())); // fills contents of box with all open windows
+        windows = new JComboBox<>(new DefaultComboBoxModel<>(WindowColorMonitor.getOpenWindowTitles())); // fills
+                                                                                                         // contents of
+                                                                                                         // box with all
+                                                                                                         // open windows
         windows.setMaximumSize(new Dimension(200, 35));
         windows.setPreferredSize(new Dimension(200, 35));
         windows.setSelectedItem(config.getCurrentScreen());
@@ -110,7 +117,7 @@ public class ShinyHuntBotGUI {
                 OtherGUI.showErrorPopup(frame, error.toString());
             }
         }); // listener
-        
+
         // mode/game selector
         leftLabels[1].setText("                          Mode:     ");
         leftPanels[1].add(leftLabels[1]);
@@ -123,7 +130,7 @@ public class ShinyHuntBotGUI {
         leftPanels[2].add(leftLabels[2]);
         currentOrientation.setMaximumSize(new Dimension(150, 25)); // selector size limitor
         leftPanels[2].add(currentOrientation);
-        currentOrientation.addActionListener(e -> selectOrientation((String) currentOrientation.getSelectedItem())); //listener
+        currentOrientation.addActionListener(e -> selectOrientation((String) currentOrientation.getSelectedItem())); // listener
 
         // text box for game speed as a percentage
         leftLabels[3].setText("      Game Speed (%):   ");
@@ -185,10 +192,11 @@ public class ShinyHuntBotGUI {
             }
         });
 
-        // three text boxes for the red green and blue of the screen color when the encounter starts
+        // three text boxes for the red green and blue of the screen color when the
+        // encounter starts
         leftLabels[5].setText("          Encounter RGB:");
         leftPanels[5].add(leftLabels[5]);
-        final String[] rgb = {"red", "green", "blue"};
+        final String[] rgb = { "red", "green", "blue" };
         for (int i = 0; i < 3; i++) {
             encounterRGB[i] = new JTextField(3); // Limit visible width to 3 characters
             restrictInputToNumbersAndLimit(encounterRGB[i], 3); // Limit input to 3 digits
@@ -214,7 +222,8 @@ public class ShinyHuntBotGUI {
 
                 private void handleChange() {
                     String textField = encounterRGB[loopNum].getText();
-                    profile.setSingleEncounterColor(rgb[loopNum], (Integer.parseInt((textField.equals("")) ? "0" : textField)));
+                    profile.setSingleEncounterColor(rgb[loopNum],
+                            (Integer.parseInt((textField.equals("")) ? "0" : textField)));
                 }
             });
             if (i < 3) {
@@ -231,7 +240,7 @@ public class ShinyHuntBotGUI {
             }
         }); // listener
         // this is for the controller number, used for parallel hunting
-        leftPanels[5].add(new Label("                                         Controller number:")); 
+        leftPanels[5].add(new Label("                                         Controller number:"));
         restrictInputToNumbersAndLimit(controllerNum, 2);
         controllerNum.setPreferredSize(new Dimension(20, 25));
         leftPanels[5].add(controllerNum);
@@ -257,8 +266,9 @@ public class ShinyHuntBotGUI {
                 selectControllerNumber(textField.equals("") ? 0 : Integer.parseInt(textField));
             }
         });
-        
-        // three text boxes for the red green and blue of the screen color when the battle starts
+
+        // three text boxes for the red green and blue of the screen color when the
+        // battle starts
         leftLabels[6].setText("                  Battle RGB:");
         leftPanels[6].add(leftLabels[6]);
         for (int i = 0; i < 3; i++) {
@@ -286,7 +296,8 @@ public class ShinyHuntBotGUI {
 
                 private void handleChange() {
                     String textField = battleRGB[loopNum].getText();
-                    profile.setSingleBattleColor(rgb[loopNum], (Integer.parseInt((textField.equals("")) ? "0" : textField)));
+                    profile.setSingleBattleColor(rgb[loopNum],
+                            (Integer.parseInt((textField.equals("")) ? "0" : textField)));
                 }
             });
             // Add spacing between text fields
@@ -303,7 +314,7 @@ public class ShinyHuntBotGUI {
                 OtherGUI.showErrorPopup(frame, error.toString());
             }
         }); // listener
-        
+
         // checkbox for if the user has a shiny charm (used for odds calculation)
         leftLabels[7].setText("      Has Shiny Charm:    ");
         leftPanels[7].add(leftLabels[7]);
@@ -324,9 +335,13 @@ public class ShinyHuntBotGUI {
                 OtherGUI.showErrorPopup(frame, error.toString());
             }
         }); // listener
-        controllerBinds.addActionListener(e -> OtherGUI.showControllerInputs(frame, profile.getControllerNum())); // controller inputs for binding
+        controllerBinds.addActionListener(e -> OtherGUI.showControllerInputs(frame, profile.getControllerNum())); // controller
+                                                                                                                  // inputs
+                                                                                                                  // for
+                                                                                                                  // binding
 
-        leftPanels[7].add(new JLabel("                                                                                          "));
+        leftPanels[7].add(new JLabel(
+                "                                                                                          "));
         leftPanels[7].add(toggleHunt); // start/stop hunt
         toggleHunt.addActionListener(e -> {
             if (toggleHunt.getText().equals("Start")) {
@@ -337,14 +352,18 @@ public class ShinyHuntBotGUI {
         });
 
         // show odds
-        attempts = new JLabel(String.format("     Attempts: %d/%d     ", profile.getAttempts(), Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
-        odds = new JLabel(String.format("     Chance of a shiny by now: %.2f%%", Odds.getChance(profile.getCurrentMode(), profile.hasShinyCharm(), profile.getAttempts()) * 100));
+        attempts = new JLabel(String.format("     Attempts: %d/%d     ", config.getAttempts(),
+                Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
+        odds = new JLabel(String.format("     Chance of a shiny by now: %.2f%%",
+                Odds.getChance(profile.getCurrentMode(), profile.hasShinyCharm(), config.getAttempts()) * 100));
         leftPanels[1].add(attempts);
         leftPanels[1].add(resetAttempts);
         resetAttempts.addActionListener(e -> {
-            profile.setAttempts(0);
-            attempts.setText(String.format("     Attempts: %d/%d     ", profile.getAttempts(), Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
-            odds.setText(String.format("     Chance of a shiny by now: %.2f%%", Odds.getChance(profile.getCurrentMode(), profile.hasShinyCharm(), profile.getAttempts()) * 100));
+            config.setAttempts(0);
+            attempts.setText(String.format("     Attempts: %d/%d     ", config.getAttempts(),
+                    Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
+            odds.setText(String.format("     Chance of a shiny by now: %.2f%%",
+                    Odds.getChance(profile.getCurrentMode(), profile.hasShinyCharm(), config.getAttempts()) * 100));
             try {
                 profile.saveSettings(config.getCurrentProfile());
             } catch (IOException error) {
@@ -376,7 +395,7 @@ public class ShinyHuntBotGUI {
                 // initial initialization (makes total sense right?)
                 mainGUI.initializeFields();
             } catch (IOException e) {
-                System.out.println(e);
+                System.out.println("Main Error: " + e);
             }
         });
     }
@@ -404,15 +423,18 @@ public class ShinyHuntBotGUI {
 
     public void hasShinyCharm(boolean isChecked) {// sets the shiny charm flag
         profile.setHasShinyCharm(isChecked);
-        attempts.setText(String.format("     Attempts: %d/%d     ", profile.getAttempts(), Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
+        attempts.setText(String.format("     Attempts: %d/%d     ", config.getAttempts(),
+                Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
     }
 
     public void selectCurrentMode(String mode) {// sets the current mode in config
         profile.setCurrentMode(mode);
     }
 
-    public void selectProfile(String profileName) throws IOException {// sets the current profile in ActiveConfig and reinitializes with new profile
+    public void selectProfile(String profileName) throws IOException {// sets the current profile in ActiveConfig and
+                                                                      // reinitializes with new profile
         config.setCurrentProfile(profileName);
+        config.setAttempts(0);
         config.saveSettings();
         initializeFields();
     }
@@ -424,7 +446,8 @@ public class ShinyHuntBotGUI {
         config.saveSettings();
     }
 
-    private void restrictInputToNumbersAndLimit(JTextField textField, int maxLength) { // limits inputs of textfields to be only maxLength numbers
+    private void restrictInputToNumbersAndLimit(JTextField textField, int maxLength) { // limits inputs of textfields to
+                                                                                       // be only maxLength numbers
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -463,22 +486,24 @@ public class ShinyHuntBotGUI {
     }
 
     public void incrimentAttempts() {// adds 1 to attempts and updates counter/odds
-        int num = profile.getAttempts(); // get current attempts and save with one added
-        profile.setAttempts(++num);
+        int num = config.getAttempts(); // get current attempts and save with one added
+        config.setAttempts(++num);
         try {
             config.saveSettings();
         } catch (IOException e) {
             OtherGUI.showErrorPopup(frame, e.toString());
         }
         // update GUI
-        attempts.setText(String.format("     Attempts: %d/%d     ", profile.getAttempts(), Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
-        odds.setText(String.format("     Chance of a shiny by now: %.2f%%", Odds.getChance(profile.getCurrentMode(), profile.hasShinyCharm(), profile.getAttempts()) * 100));
+        attempts.setText(String.format("     Attempts: %d/%d     ", config.getAttempts(),
+                Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
+        odds.setText(String.format("     Chance of a shiny by now: %.2f%%",
+                Odds.getChance(profile.getCurrentMode(), profile.hasShinyCharm(), config.getAttempts()) * 100));
     }
 
     public void setBattleRGB() throws Exception { // sets the rgb from the selected screen and orientation
         String windowName = config.getCurrentScreen();
         Color currentColor = WindowColorMonitor.getPixelColorAtCenter(windowName, profile.getCurrentOrientation());
-        int[] currentRGB = {currentColor.getRed(), currentColor.getGreen(), currentColor.getBlue()};
+        int[] currentRGB = { currentColor.getRed(), currentColor.getGreen(), currentColor.getBlue() };
         for (int i = 0; i < 3; i++) {
             battleRGB[i].setText("" + currentRGB[i]);
         }
@@ -487,7 +512,7 @@ public class ShinyHuntBotGUI {
     public void setEncounterRGB() throws Exception { // sets the rgb from the selected screen and orientation
         String windowName = config.getCurrentScreen();
         Color currentColor = WindowColorMonitor.getPixelColorAtCenter(windowName, profile.getCurrentOrientation());
-        int[] currentRGB = {currentColor.getRed(), currentColor.getGreen(), currentColor.getBlue()};
+        int[] currentRGB = { currentColor.getRed(), currentColor.getGreen(), currentColor.getBlue() };
         for (int i = 0; i < 3; i++) {
             encounterRGB[i].setText("" + currentRGB[i]);
         }
@@ -510,7 +535,8 @@ public class ShinyHuntBotGUI {
         OtherGUI.showSuccessPopup(frame, "Starting Shiny Hunt");
         toggleHunt.setText("Stop"); // started, so give option for start
 
-        // Create a new thread for the infinite loop so that GUI is usable before loop ends
+        // Create a new thread for the infinite loop so that GUI is usable before loop
+        // ends
         huntThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -523,22 +549,30 @@ public class ShinyHuntBotGUI {
                 float baseTime = 0;
                 while (!shinyEncounter && config.isCurrentlyHunting()) { // while no shiny and not stopped
                     if (Thread.currentThread().isInterrupted()) {
-                        break;
+                        throw new Error("Hunt Interupted");
                     }
                     try {
                         SoftReseter.reset(profile.getCurrentMode(), profile.getControllerNum()); // does soft reset
                         Boolean hasEncountered = false, battleStarted = false; // encounter hasnt happened, nor battle
-                        long encounterTime = 0, battleTime = 0; //  time variables
+                        long encounterTime = 0, battleTime = 0; // time variables
                         while (!battleStarted) { // while the battle hasn't started, keep grabbing color and checking
-                            color = WindowColorMonitor.getPixelColorAtCenter(config.getCurrentScreen(), profile.getCurrentOrientation()); // grab color
+                            if (Thread.currentThread().isInterrupted()) {
+                                throw new Error("Hunt Interupted");
+                            }
+                            color = WindowColorMonitor.getPixelColorAtCenter(config.getCurrentScreen(),
+                                    profile.getCurrentOrientation()); // grab color
                             if (color == null) { // if the color is empty, that means the window wasn't found
                                 throw new Exception("Window not found");
                             }
-                            if (!hasEncountered && color.equals(encounterColor)) { // if it has not yet encountered, record starting time and set encounter true
+                            if (!hasEncountered && color.equals(encounterColor)) { // if it has not yet encountered,
+                                                                                   // record starting time and set
+                                                                                   // encounter true
                                 hasEncountered = true;
                                 encounterTime = System.currentTimeMillis();
                                 System.out.print("Started Time...  ");
-                            } else if (hasEncountered && color.equals(battleColor)) { // if already encountered and the battle has started, end time and stop loop
+                            } else if (hasEncountered && color.equals(battleColor)) { // if already encountered and the
+                                                                                      // battle has started, end time
+                                                                                      // and stop loop
                                 battleTime = System.currentTimeMillis();
                                 battleStarted = true;
                                 System.out.print("Ended Time!");
@@ -547,12 +581,16 @@ public class ShinyHuntBotGUI {
                         // if first encounter, get time as base time to compare to later.
                         float encounterDelay = battleTime - encounterTime - baseTime;
                         baseTime = (baseTime == 0 ? battleTime - encounterTime : baseTime);
-                        // if not first time, find the difference. If greater than the given minimum delay, its a possible shiny
+                        // if not first time, find the difference. If greater than the given minimum
+                        // delay, its a possible shiny
                         shinyEncounter = battleTime - encounterTime - baseTime > profile.getMinimumDelay();
-                        System.out.printf(" Encounter %d time period: " + (encounterDelay > 0 ? " %-4.0f Shiny: %s%n" : "-%-4.0f Shiny: %s%n"), profile.getAttempts() + 1, Math.abs(encounterDelay), shinyEncounter);
+                        System.out.printf(
+                                " Encounter %d time period: "
+                                        + (encounterDelay > 0 ? " %-4.0f Shiny: %s%n" : "-%-4.0f Shiny: %s%n"),
+                                config.getAttempts() + 1, Math.abs(encounterDelay), shinyEncounter);
                     } catch (InterruptedException e) {
                         OtherGUI.showErrorPopup(frame, "Shiny Hunt Interrupted.");
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         OtherGUI.showErrorPopup(frame, e.toString());
                         break;
                     }
@@ -568,7 +606,7 @@ public class ShinyHuntBotGUI {
                     OtherGUI.showSuccessPopup(frame, "Success! Delay: " + baseTime);
                 }
                 // hunt is over, so set button to start again
-                toggleHunt.setText("Start");   
+                toggleHunt.setText("Start");
             }
         });
         huntThread.start(); // Start the thread

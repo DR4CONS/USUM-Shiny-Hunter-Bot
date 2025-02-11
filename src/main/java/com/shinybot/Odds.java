@@ -18,7 +18,7 @@ public class Odds {
     }
     // given config for specific hunt and charm boolean, returns the x in "1/x odds" 
     public static int getOdds(String mode, boolean hasShinyCharm) {
-        final String[] modes = {"usum_legends"};
+        final String[] modes = {"usum_legends", "usum_ub"};
     
         final int[] baseOdds = {4096,4096};
         final int[] charmOdds = {1395,1395};
