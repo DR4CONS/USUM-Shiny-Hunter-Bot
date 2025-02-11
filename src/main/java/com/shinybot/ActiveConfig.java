@@ -16,14 +16,12 @@ public class ActiveConfig extends Config {
     public ActiveConfig() throws IOException {
         JSONObject settings;
         try {
-            System.out.println("Trying");
             settings = readSettings("Shinybot/", fileName);
             currentlyHunting = settings.getBoolean("currentlyHunting");
             currentProfile = settings.getString("currentProfile");
             currentScreen = settings.getString("currentScreen");
             attempts = settings.getJSONObject("attempts");
         } catch (IOException e) {
-            System.out.println("catching");
             settings = new JSONObject();
             settings.put("currentlyHunting", currentlyHunting);
             settings.put("currentProfile", currentProfile);
@@ -31,7 +29,6 @@ public class ActiveConfig extends Config {
             attempts = new JSONObject();
             attempts.put("New Profile", 0);
             settings.put("attempts", attempts);
-            System.out.println("Saving");
             saveSettings();
         }
     }
@@ -77,6 +74,11 @@ public class ActiveConfig extends Config {
     }
 
     public int getAttempts() {
+        try {
+            attempts.getInt(currentProfile);
+        } catch (Exception e) {
+            attempts.put(currentProfile, 0);
+        }
         return attempts.getInt(currentProfile);
     }
 

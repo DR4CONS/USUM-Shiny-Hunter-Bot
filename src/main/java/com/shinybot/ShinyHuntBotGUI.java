@@ -431,10 +431,8 @@ public class ShinyHuntBotGUI {
         profile.setCurrentMode(mode);
     }
 
-    public void selectProfile(String profileName) throws IOException {// sets the current profile in ActiveConfig and
-                                                                      // reinitializes with new profile
+    public void selectProfile(String profileName) throws IOException {// sets the current profile in ActiveConfig and reinitializes with new profile
         config.setCurrentProfile(profileName);
-        config.setAttempts(0);
         config.saveSettings();
         initializeFields();
     }
@@ -635,5 +633,10 @@ public class ShinyHuntBotGUI {
             encounterRGB[i].setText("" + encounterColor[i]);
             battleRGB[i].setText("" + battleColor[i]);
         }
+
+        attempts.setText(String.format("     Attempts: %d/%d     ", config.getAttempts(),
+                Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
+        odds.setText(String.format("     Chance of a shiny by now: %.2f%%",
+                Odds.getChance(profile.getCurrentMode(), profile.hasShinyCharm(), config.getAttempts()) * 100));
     }
 }
