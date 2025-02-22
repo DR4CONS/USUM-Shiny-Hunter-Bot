@@ -30,6 +30,56 @@ With that out of the way,
 
 ## Setting up discord notifications
 There are 2 checkboxes you probably haven't checked yet: Save Pictures, and Listen for instructions. Go ahead and check Listen for instructions and it should automatically enable the first checkbox. To download the discord bot, go to [its repository](https://github.com/DR4CONS/ShinyHuntDiscordBot) and follow the instructions there.
+**NOTE:** The catch option will throw **ONE** ball and then save. If you plan on using this, either have master ball selected or consider using the following cheat codes.
+<details>
+  <summary>**VIEW CODES**</summary>
+  Make sure you are using the correct version!
+  
+  [100%Catch v1.2]
+```
+  005BBEA0 E5D00008
+  005BBEA4 E92D4003
+  005BBEA8 E59D0010
+  005BBEAC E59F100C
+  005BBEB0 E1510000
+  005BBEB4 024000F8
+  005BBEB8 058D0010
+  005BBEBC E8BD8003
+  005BBEC0 0070C62C
+  004ACD2C EB043C5B
+```
+
+  [100%Catch v1.1]
+```
+005BBEA0 E5D00008
+005BBEA4 E92D4003
+005BBEA8 E59D0010
+005BBEAC E59F100C
+005BBEB0 E1510000
+005BBEB4 024000F8
+005BBEB8 058D0010
+005BBEBC E8BD8003
+005BBEC0 0070C62C
+004ACD24 EB043C5D
+```
+  [100%Catch v1.0]
+```
+58036714 0A000004
+50667004 00000000
+00667004 00000010
+D0000000 00000000
+D0000000 00000000
+60667004 00000000
+D9000000 00667004
+D4000000 FFFFFFFF
+D6000000 00667004
+D0000000 00000000
+D3000000 00000000
+50667004 00000001
+08036714 EA000004
+D0000000 00000000
+```
+</details>
 
 # Other things to be aware of
 As I've mentioned before, lag can lead to false positives, but shouldn't if you don't tweak the default settings too much. If your game is not noticably lagging, but your program is giving false positives, contact me through my discord support server at the bottom of this page.
