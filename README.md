@@ -4,13 +4,13 @@ Right now, all this supports is the ultra wormhole hunts, but I'll probably try 
 
 With that out of the way,
 # Installation
-**Requirements:**
+## **Requirements:**
 - Right now, I've only tested this with [lime3ds](https://github.com/Lime3DS/lime3ds-archive)(now [Azahar](https://github.com/azahar-emu/azahar?tab=readme-ov-file), but I didn't test this one), but it should be the exact same with any other emulators as long as they allow you to set keybinds.
 - [vJoy](https://sourceforge.net/projects/vjoystick/) is what allows for controller inputs, which allows for the resets to continue even if the emulator isn't the selected screen(still must be visable though)
 - [Java](https://www.java.com/en/download/) is needed to actually run the .jar file. For help with install, I recommend [this video](https://www.youtube.com/watch?v=jPwrWjEwtrw) if you need it
 - A save file that is set up right in front of the 
 
-**Process:**
+## **Process:**
 - Make sure you have all of the requirements installed
 - Download the [latest release](https://github.com/DR4CONS/USUMShinyBot/releases)
 - Run the ShinyBot-x.x.jar file once to create the config folder, and a second time to bring up the GUI and open your emulator.
@@ -19,15 +19,17 @@ With that out of the way,
 - Next, go to the emulator's controls settings and press "Controller" on the GUI.
 - Ready the emulator to record each keybind(this is done on lime3ds by clicking on the current bind), then press the corrosponding button on the "Controller Inputs" popup
 - Finally, in the "Screen" dropdown at the top right of the GUI, select the name of the window that displays the emulated game, example: "Lime3ds 2116 | Pokemon Ultra Moon | Primary Window. If your emulator screen doesn't show up, select a random one and check again. Selecing a screen will refresh the dropdown.
-- Now pressing "Start" should start the hunt!
+- Now pressing "Start" should start the hunt! If you want to set up discord notifications, go to [Setting up discord notifications](#setting-up-discord-notifications)
 
-# Other Config Settings
+## Other Config Settings
 - **Mode**: Select the hunt you are set up for, this determines the reset and encounter steps.
 - **Screen Layout**: *default* is for if you have one window with both screens in the same places they are on a DS. *bottom_screen* is for if you have both screens in seperate windows. For this, you would select the bottom screen in the "Screen" dropdown
 - **Game Speed**: If you want to run your emulator at a higher game speed, set your speed as a percentage here. **WARNING**: Higher game speed will lead to false positives with smaller ammounts of lag
 - **Minimum Delay**: I recommend you keep this at default. The delay caused by a shiny pokemon is ~1.2 seconds, but if you keep it too close to that number, even a little lag can cause false positives. Having this set too low can cause the same thing.
 - **Has Shiny Charm**: I mean, this one's pretty self-explanatory... It's used in the odds calculations.
 
+## Setting up discord notifications
+There are 2 checkboxes you probably haven't checked yet: Save Pictures, and Listen for instructions. Go ahead and check Listen for instructions and it should automatically enable the first checkbox. To download the discord bot, go to [its repository](https://github.com/DR4CONS/ShinyHuntDiscordBot) and follow the instructions there.
 
 # Other things to be aware of
 As I've mentioned before, lag can lead to false positives, but shouldn't if you don't tweak the default settings too much. If your game is not noticably lagging, but your program is giving false positives, contact me through my discord support server at the bottom of this page.
