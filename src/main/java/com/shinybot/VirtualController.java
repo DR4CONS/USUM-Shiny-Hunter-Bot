@@ -10,7 +10,7 @@ import com.sun.jna.Native;
 
 public class VirtualController {
 
-    private int joystickId, lButtonId, rButtonId, startButtonId, aButtonId, upButtonId;
+    private int joystickId, lButtonId, rButtonId, startButtonId, aButtonId, upButtonId, yButtonId, xButtonId;
 
     private interface VJoyInterface extends Library {
         VJoyInterface INSTANCE = (VJoyInterface) loadLibrary();
@@ -22,18 +22,23 @@ public class VirtualController {
 
 
     // takes a controller number and sets button and stick id's
-    public VirtualController(int controllerNumber) {
+    public VirtualController(int controllerNumber) throws Exception {
+        if (controllerNumber < 1 || controllerNumber > 9) {
+            throw new Exception("You cannot enter that controller id");
+        }
         joystickId = controllerNumber < 1 ? 1 : controllerNumber;
-        int firstButtonId = ( controllerNumber - 1 ) * 5; 
+        int firstButtonId = ( controllerNumber - 1 ) * 7; 
         lButtonId = ++firstButtonId;
         rButtonId = ++firstButtonId;
         startButtonId = ++firstButtonId;
         aButtonId = ++firstButtonId;
         upButtonId = ++firstButtonId;
+        yButtonId = ++firstButtonId;
+        xButtonId = ++firstButtonId;
     }
 
     // defaults to 1
-    public VirtualController() {
+    public VirtualController() throws Exception {
         this(1);
     }
 
@@ -58,7 +63,7 @@ public class VirtualController {
             tempFile.deleteOnExit();
 
             // Load the DLL
-            return Native.loadLibrary(tempFile.getAbsolutePath(), VJoyInterface.class);
+            return Native.load(tempFile.getAbsolutePath(), VJoyInterface.class);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load vJoyInterface.dll", e);
         }
@@ -112,6 +117,24 @@ public class VirtualController {
         } 
         return false;
     }
+    public Boolean pressYButton() {
+        if (vJoy.AcquireVJD(joystickId)) {
+            // Simulate button press
+            vJoy.SetBtn(true, joystickId, yButtonId);
+            vJoy.RelinquishVJD(joystickId);
+            return true;
+        } 
+        return false;
+    }
+    public Boolean pressXButton() {
+        if (vJoy.AcquireVJD(joystickId)) {
+            // Simulate button press
+            vJoy.SetBtn(true, joystickId, xButtonId);
+            vJoy.RelinquishVJD(joystickId);
+            return true;
+        } 
+        return false;
+    }
     
     // toggles buttons off
     public Boolean releaseLButton() {
@@ -154,6 +177,24 @@ public class VirtualController {
         if (vJoy.AcquireVJD(joystickId)) {
             // Simulate button press
             vJoy.SetBtn(false, joystickId, upButtonId);
+            vJoy.RelinquishVJD(joystickId);
+            return true;
+        } 
+        return false;
+    }
+    public Boolean releaseYButton() {
+        if (vJoy.AcquireVJD(joystickId)) {
+            // Simulate button press
+            vJoy.SetBtn(false, joystickId, yButtonId);
+            vJoy.RelinquishVJD(joystickId);
+            return true;
+        } 
+        return false;
+    }
+    public Boolean releaseXButton() {
+        if (vJoy.AcquireVJD(joystickId)) {
+            // Simulate button press
+            vJoy.SetBtn(false, joystickId, xButtonId);
             vJoy.RelinquishVJD(joystickId);
             return true;
         } 
@@ -218,6 +259,32 @@ public class VirtualController {
             Thread.sleep(100);
     
             vJoy.SetBtn(false, joystickId, upButtonId);
+    
+            vJoy.RelinquishVJD(joystickId);
+            return true;
+        } 
+        return false;
+    }
+    public Boolean yButtonInput() throws InterruptedException {
+        if (vJoy.AcquireVJD(joystickId)) {
+            vJoy.SetBtn(true, joystickId, yButtonId);
+            
+            Thread.sleep(100);
+    
+            vJoy.SetBtn(false, joystickId, yButtonId);
+    
+            vJoy.RelinquishVJD(joystickId);
+            return true;
+        } 
+        return false;
+    }
+    public Boolean xButtonInput() throws InterruptedException {
+        if (vJoy.AcquireVJD(joystickId)) {
+            vJoy.SetBtn(true, joystickId, xButtonId);
+            
+            Thread.sleep(100);
+    
+            vJoy.SetBtn(false, joystickId, xButtonId);
     
             vJoy.RelinquishVJD(joystickId);
             return true;

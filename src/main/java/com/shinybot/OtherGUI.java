@@ -85,7 +85,7 @@ public class OtherGUI {
     }
 
     // method to bring up window to set controller binds
-    public static void showControllerInputs(JFrame parentFrame, int controllerNumber) {
+    public static void showControllerInputs(JFrame parentFrame, int controllerNumber) throws Exception {
         JDialog inputDialog = new JDialog(parentFrame, "Controller Inputs", true); // Modle dialog
         inputDialog.setLayout(new FlowLayout());
 
@@ -136,16 +136,41 @@ public class OtherGUI {
                 showErrorPopup(parentFrame, error.toString());
             }
         });
+        JButton yButton = new JButton("Y Button");
+        yButton.addActionListener(e -> {
+            try {
+                vc.yButtonInput();   
+            } catch (InterruptedException error) {
+                showErrorPopup(parentFrame, error.toString());
+            }
+        });
+        JButton xButton = new JButton("X Button");
+        xButton.addActionListener(e -> {
+            try {
+                vc.xButtonInput();   
+            } catch (InterruptedException error) {
+                showErrorPopup(parentFrame, error.toString());
+            }
+        });
 
         inputDialog.add(lButton);
+        inputDialog.add(new JLabel(" "));
         inputDialog.add(rButton);
+        inputDialog.add(new JLabel(" "));
         inputDialog.add(startButton);
+        inputDialog.add(new JLabel(" "));
         inputDialog.add(upButton);
+        inputDialog.add(new JLabel(" "));
         inputDialog.add(aButton);
+        inputDialog.add(new JLabel(" "));
         inputDialog.add(rButton);
+        inputDialog.add(new JLabel(" "));
+        inputDialog.add(yButton);
+        inputDialog.add(new JLabel(" "));
+        inputDialog.add(xButton);
 
         // Set dialog properties
-        inputDialog.setSize(300, 150);
+        inputDialog.setSize(450, 110);
         inputDialog.setAlwaysOnTop(true); // Keep the popup on top
         inputDialog.setLocationRelativeTo(parentFrame); // Center the dialog
         inputDialog.setVisible(true);

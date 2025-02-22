@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Label;
 import java.awt.event.ItemEvent;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
@@ -30,6 +31,8 @@ public class ShinyHuntBotGUI {
 
     // GUI Fields
     final private JCheckBox shinyCharmCheckbox = new JCheckBox();
+    final private JCheckBox savePictureCheckbox = new JCheckBox();
+    final private JCheckBox listenCheckbox = new JCheckBox();
 
     final private JTextField[] encounterRGB = new JTextField[3];
     final private JTextField[] battleRGB = new JTextField[3];
@@ -56,6 +59,7 @@ public class ShinyHuntBotGUI {
     private final JLabel attempts;
     private final JLabel odds;
     private Thread huntThread;
+    private FileWatcher watcher;
 
     // Create GUI
     public ShinyHuntBotGUI() throws IOException {
@@ -72,7 +76,7 @@ public class ShinyHuntBotGUI {
         // create all labels to line up later
         JLabel[] leftLabels = new JLabel[8];
         JPanel[] leftPanels = new JPanel[8];
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < leftPanels.length; i++) {
             leftPanels[i] = new JPanel();
             leftPanels[i].setLayout(new BoxLayout(leftPanels[i], BoxLayout.X_AXIS));
             leftPanels[i].setAlignmentX(Component.LEFT_ALIGNMENT); // Align left
@@ -83,11 +87,8 @@ public class ShinyHuntBotGUI {
         // profile selector
         leftLabels[0].setText("Profile:  ");
         leftPanels[0].add(leftLabels[0]);
-        currentProfile = new JComboBox<>(new DefaultComboBoxModel<>(ShinyBotConfig.getProfiles())); // list of profiles
-                                                                                                    // derived from
-                                                                                                    // .json files in
-                                                                                                    // the save
-                                                                                                    // directory
+        // list of profiles derived from .json files in the save directory
+        currentProfile = new JComboBox<>(new DefaultComboBoxModel<>(ShinyBotConfig.getProfiles()));
         currentProfile.setSelectedItem(config.getCurrentProfile());
         currentProfile.setMaximumSize(new Dimension(200, 25)); // max size of selector box
         currentProfile.setPreferredSize(new Dimension(200, 25));
@@ -102,10 +103,8 @@ public class ShinyHuntBotGUI {
 
         // selector for screen to monitor
         leftPanels[0].add(new JLabel("     Screen:   "));
-        windows = new JComboBox<>(new DefaultComboBoxModel<>(WindowColorMonitor.getOpenWindowTitles())); // fills
-                                                                                                         // contents of
-                                                                                                         // box with all
-                                                                                                         // open windows
+        // fills contents of box with all open windows
+        windows = new JComboBox<>(new DefaultComboBoxModel<>(WindowColorMonitor.getOpenWindowTitles()));
         windows.setMaximumSize(new Dimension(200, 35));
         windows.setPreferredSize(new Dimension(200, 35));
         windows.setSelectedItem(config.getCurrentScreen());
@@ -162,6 +161,15 @@ public class ShinyHuntBotGUI {
             }
         });
 
+        JLabel pictureLabel = new JLabel();
+        pictureLabel.setText("                                             Save Pictures(notifications):    ");
+        leftPanels[3].add(pictureLabel);
+        leftPanels[3].add(savePictureCheckbox);
+        savePictureCheckbox.addItemListener(e -> { // listener for checkbox
+            boolean isChecked = e.getStateChange() == ItemEvent.SELECTED;
+            isSavingPictures(isChecked);
+        });
+
         // text box input for minimum delay to consider a shiny
         leftLabels[4].setText("Minimum Delay(ms):   ");
         leftPanels[4].add(leftLabels[4]);
@@ -190,6 +198,15 @@ public class ShinyHuntBotGUI {
                 String textField = minimumDelay.getText();
                 profile.setMinimumDelay(Integer.parseInt((textField.equals("")) ? "0" : textField));
             }
+        });
+
+        JLabel listenLabel = new JLabel();
+        listenLabel.setText("                                            Listen for instructions:               ");
+        leftPanels[4].add(listenLabel);
+        leftPanels[4].add(listenCheckbox);
+        listenCheckbox.addItemListener(e -> { // listener for checkbox
+            boolean isChecked = e.getStateChange() == ItemEvent.SELECTED;
+            isListening(isChecked);
         });
 
         // three text boxes for the red green and blue of the screen color when the
@@ -241,7 +258,7 @@ public class ShinyHuntBotGUI {
         }); // listener
         // this is for the controller number, used for parallel hunting
         leftPanels[5].add(new Label("                                         Controller number:"));
-        restrictInputToNumbersAndLimit(controllerNum, 2);
+        restrictInputToNumbersAndLimit(controllerNum, 1);
         controllerNum.setPreferredSize(new Dimension(20, 25));
         leftPanels[5].add(controllerNum);
         controllerNum.getDocument().addDocumentListener(new DocumentListener() { // listener
@@ -335,17 +352,25 @@ public class ShinyHuntBotGUI {
                 OtherGUI.showErrorPopup(frame, error.toString());
             }
         }); // listener
-        controllerBinds.addActionListener(e -> OtherGUI.showControllerInputs(frame, profile.getControllerNum())); // controller
-                                                                                                                  // inputs
-                                                                                                                  // for
-                                                                                                                  // binding
+        // controller inputs for binding
+        controllerBinds.addActionListener(e -> {
+            try {
+                OtherGUI.showControllerInputs(frame, profile.getControllerNum());
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                OtherGUI.showErrorPopup(frame, e1.toString());
+            }
+        });
 
         leftPanels[7].add(new JLabel(
-                "                                                                                          "));
+                "                                                                                         "));
         leftPanels[7].add(toggleHunt); // start/stop hunt
         toggleHunt.addActionListener(e -> {
             if (toggleHunt.getText().equals("Start")) {
+                OtherGUI.showSuccessPopup(frame, "Starting Shiny Hunt");
                 startHunt(); // starts Shiny hunt
+            } else if (toggleHunt.getText().equals("Listening")) {
+                watcher.interrupt();
             } else {
                 stopHunt();
             }
@@ -364,11 +389,6 @@ public class ShinyHuntBotGUI {
                     Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
             odds.setText(String.format("     Chance of a shiny by now: %.2f%%",
                     Odds.getChance(profile.getCurrentMode(), profile.hasShinyCharm(), config.getAttempts()) * 100));
-            try {
-                profile.saveSettings(config.getCurrentProfile());
-            } catch (IOException error) {
-                OtherGUI.showErrorPopup(frame, error.toString());
-            }
         });
         leftPanels[2].add(odds);
 
@@ -404,11 +424,11 @@ public class ShinyHuntBotGUI {
         profile.setControllerNum(num);
     }
 
-    private void selectOrientation(String orientation) {// sets the orientation
+    public void selectOrientation(String orientation) {// sets the orientation
         profile.setCurrentOrientation(orientation);
     }
 
-    private void saveButton() throws IOException {// saves settings to the currentProfile in ActiveConfig
+    public void saveButton() throws IOException {// saves settings to the currentProfile in ActiveConfig
         System.out.println(profile.toString());
         String theName = config.getCurrentProfile();
         if (theName.equals("New Profile")) { // if new profile is selected, then prompt the user to create a new name
@@ -427,11 +447,35 @@ public class ShinyHuntBotGUI {
                 Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
     }
 
+    public void isSavingPictures(boolean isChecked) {// sets the picture saving flag
+        File folder = new File("Shinybot/pictures/");
+        if (!folder.exists()) {
+            if (folder.mkdirs()) { // mkdirs() also creates any necessary parent directories
+                System.out.println("Folder and any necessary parent directories were created.");
+            } else {
+                System.out.println("Failed to create folder.");
+            }
+        }
+
+        if (!isChecked && profile.isListening()) {
+            listenCheckbox.setSelected(false);
+        }
+        profile.setSavingPictures(isChecked);
+    }
+
+    public void isListening(boolean isChecked) {
+        if (isChecked && !profile.isSavingPictures()) {
+            savePictureCheckbox.setSelected(true);
+        }
+        profile.setListening(isChecked);
+    }
+
     public void selectCurrentMode(String mode) {// sets the current mode in config
         profile.setCurrentMode(mode);
     }
 
-    public void selectProfile(String profileName) throws IOException {// sets the current profile in ActiveConfig and reinitializes with new profile
+    public void selectProfile(String profileName) throws IOException {// sets the current profile in ActiveConfig and
+                                                                      // reinitializes with new profile
         config.setCurrentProfile(profileName);
         config.saveSettings();
         initializeFields();
@@ -486,11 +530,6 @@ public class ShinyHuntBotGUI {
     public void incrimentAttempts() {// adds 1 to attempts and updates counter/odds
         int num = config.getAttempts(); // get current attempts and save with one added
         config.setAttempts(++num);
-        try {
-            config.saveSettings();
-        } catch (IOException e) {
-            OtherGUI.showErrorPopup(frame, e.toString());
-        }
         // update GUI
         attempts.setText(String.format("     Attempts: %d/%d     ", config.getAttempts(),
                 Odds.getOdds(profile.getCurrentMode(), profile.hasShinyCharm())));
@@ -529,12 +568,28 @@ public class ShinyHuntBotGUI {
         }
     }
 
-    private void startHunt() { // shiny hunting program
-        OtherGUI.showSuccessPopup(frame, "Starting Shiny Hunt");
+    public void changeToggleButton(String buttonName) {
+        toggleHunt.setText(buttonName);
+    }
+    
+    private volatile boolean gotShiny = false;
+    public void startHunt() { // shiny hunting program
         toggleHunt.setText("Stop"); // started, so give option for start
+
+        String fileName = config.getCurrentProfile() + "-" + profile.getControllerNum();
+        File imageOutput = new File("Shinybot/pictures/" + fileName + ".png");
+        File saveOutput = new File("Shinybot/pictures/save-" + profile.getControllerNum());
+
+        if (imageOutput.exists() && profile.isListening()) {
+            imageOutput.delete();
+        }
+        if (saveOutput.exists() && profile.isListening()) {
+            saveOutput.delete();
+        }
 
         // Create a new thread for the infinite loop so that GUI is usable before loop
         // ends
+
         huntThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -543,14 +598,14 @@ public class ShinyHuntBotGUI {
                 int[] battleRGB = profile.getBattleColor(), encounterRGB = profile.getEncounterColor();
                 Color battleColor = new Color(battleRGB[0], battleRGB[1], battleRGB[2]),
                         encounterColor = new Color(encounterRGB[0], encounterRGB[1], encounterRGB[2]), color;
-                Boolean shinyEncounter = false;
                 float baseTime = 0;
+                boolean shinyEncounter = false;
                 while (!shinyEncounter && config.isCurrentlyHunting()) { // while no shiny and not stopped
                     if (Thread.currentThread().isInterrupted()) {
                         throw new Error("Hunt Interupted");
                     }
                     try {
-                        SoftReseter.reset(profile.getCurrentMode(), profile.getControllerNum()); // does soft reset
+                        ComboInputs.reset(profile.getCurrentMode(), profile.getControllerNum()); // does soft reset
                         Boolean hasEncountered = false, battleStarted = false; // encounter hasnt happened, nor battle
                         long encounterTime = 0, battleTime = 0; // time variables
                         while (!battleStarted) { // while the battle hasn't started, keep grabbing color and checking
@@ -581,7 +636,8 @@ public class ShinyHuntBotGUI {
                         baseTime = (baseTime == 0 ? battleTime - encounterTime : baseTime);
                         // if not first time, find the difference. If greater than the given minimum
                         // delay, its a possible shiny
-                        shinyEncounter = battleTime - encounterTime - baseTime > profile.getMinimumDelay();
+                        shinyEncounter = battleTime - encounterTime - baseTime > profile.getMinimumDelay()
+                                && battleTime - encounterTime - baseTime < profile.getMinimumDelay() + 10000;
                         System.out.printf(
                                 " Encounter %d time period: "
                                         + (encounterDelay > 0 ? " %-4.0f Shiny: %s%n" : "-%-4.0f Shiny: %s%n"),
@@ -601,10 +657,26 @@ public class ShinyHuntBotGUI {
                     });
                 }
                 if (shinyEncounter) {
-                    OtherGUI.showSuccessPopup(frame, "Success! Delay: " + baseTime);
+                    gotShiny = true;
                 }
                 // hunt is over, so set button to start again
                 toggleHunt.setText("Start");
+                if (gotShiny) {
+                    if (profile.isSavingPictures()) {
+                        WindowScreenshot.saveScreenshot(config.getCurrentScreen(), "Shinybot/pictures/", fileName);
+                    }
+                    if (profile.isListening()) {
+                        toggleHunt.setText("Listening");
+                        try {
+                            watcher = new FileWatcher(fileName + ".png", "save-" + profile.getControllerNum(), ShinyHuntBotGUI.this);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        OtherGUI.showSuccessPopup(frame, "Found Possible Shiny!");
+                    }
+                }
+                gotShiny = false;
             }
         });
         huntThread.start(); // Start the thread
@@ -626,6 +698,8 @@ public class ShinyHuntBotGUI {
 
         // set checkbox state
         shinyCharmCheckbox.setSelected(profile.hasShinyCharm());
+        savePictureCheckbox.setSelected(profile.isSavingPictures());
+        listenCheckbox.setSelected(profile.isListening());
 
         // set rgb textbox contents
         int[] encounterColor = profile.getEncounterColor(), battleColor = profile.getBattleColor();

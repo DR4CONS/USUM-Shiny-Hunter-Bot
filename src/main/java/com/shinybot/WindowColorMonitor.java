@@ -18,7 +18,7 @@ public class WindowColorMonitor {
 
     // Windows API functions
     public interface User32 extends Library {
-        User32 INSTANCE = (User32) Native.loadLibrary("user32", User32.class);
+        User32 INSTANCE = (User32) Native.load("user32", User32.class);
 
         // EnumWindows to enumerate through all windows
         boolean EnumWindows(WNDENUMPROC lpEnumFunc, Pointer arg);

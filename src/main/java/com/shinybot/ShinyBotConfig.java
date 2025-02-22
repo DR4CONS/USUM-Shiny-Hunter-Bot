@@ -9,8 +9,8 @@ import org.json.JSONObject;
 
 public class ShinyBotConfig extends Config {
     // available modes and orientations
-    final private String[] modes = {"usum_legends", "usum_ub"};
-    final private String[] orientations = {"default", "bottom_screen"};
+    final private String[] modes = { "usum_legends", "usum_ub" };
+    final private String[] orientations = { "default", "bottom_screen" };
 
     // config fields with defaults
     private int controllerNum = 1;
@@ -18,11 +18,13 @@ public class ShinyBotConfig extends Config {
     private int currentOrientation = 0;
     private int gameSpeed = 100;
     private boolean hasShinyCharm = false;
+    private boolean isSavingPictures = false;
+    private boolean isListening = false;
     private String profileName = "New Profile";
     private int minimumDelay = 500;
     private int[] encounterColor = new int[3];
     private int[] battleColor = new int[3];
-    
+
     // default constructor is new profile
     public ShinyBotConfig() {
         this("New Profile");
@@ -32,20 +34,34 @@ public class ShinyBotConfig extends Config {
         if (!profileName.equals("New Profile")) { // if profile is not default, load values from file
             try {
                 JSONObject settings = readSettings("Shinybot/profiles/", profileName);
-                currentMode = settings.getInt("currentMode");
-                currentOrientation = settings.getInt("currentOrientation");
-                gameSpeed = settings.getInt("gameSpeed");
-                hasShinyCharm = settings.getBoolean("hasShinyCharm");
-                minimumDelay = settings.getInt("minimumDelay");
-                controllerNum = settings.getInt("controllerNum");
+                currentMode = settings.has("currentMode") ? settings.getInt("currentMode") : currentMode;
+                currentOrientation = settings.has("currentOrientation") ? settings.getInt("currentOrientation")
+                        : currentOrientation;
+                gameSpeed = settings.has("gameSpeed") ? settings.getInt("gameSpeed") : gameSpeed;
+                hasShinyCharm = settings.has("hasShinyCharm") ? settings.getBoolean("hasShinyCharm") : hasShinyCharm;
+                isSavingPictures = settings.has("isSavingPictures") ? settings.getBoolean("isSavingPictures")
+                        : isSavingPictures;
+                isListening = settings.has("isListening") ? settings.getBoolean("isListening") : isListening;
+                minimumDelay = settings.has("minimumDelay") ? settings.getInt("minimumDelay") : minimumDelay;
+                controllerNum = settings.has("controllerNum") ? settings.getInt("controllerNum") : controllerNum;
 
-                JSONArray colorNums = settings.getJSONArray("encounterColor");
                 for (int i = 0; i < 3; i++) {
-                    encounterColor[i] = colorNums.getInt(i);
+                    encounterColor[i] = 0;
+                    battleColor[i] = 0;
                 }
-                colorNums = settings.getJSONArray("battleColor");
-                for (int i = 0; i < 3; i++) {
-                    battleColor[i] = colorNums.getInt(i);
+
+                if (settings.has("encounterColor")) {
+                    JSONArray colorNums = settings.getJSONArray("encounterColor");
+                    for (int i = 0; i < 3; i++) {
+                        encounterColor[i] = colorNums.getInt(i);
+                    }
+                }
+
+                if (settings.has("battleColor")) {
+                    JSONArray colorNums = settings.getJSONArray("battleColor");
+                    for (int i = 0; i < 3; i++) {
+                        battleColor[i] = colorNums.getInt(i);
+                    }
                 }
 
                 this.profileName = profileName;
@@ -67,17 +83,21 @@ public class ShinyBotConfig extends Config {
         settings.put("encounterColor", encounterColor);
         settings.put("battleColor", battleColor);
         settings.put("controllerNum", controllerNum);
+        settings.put("isSavingPictures", isSavingPictures);
+        settings.put("isListening", isListening);
 
         writeSettings(new File("Shinybot/profiles/"), filename, settings);
     }
 
-    // options getters 
+    // options getters
     public String[] getModes() {
         return modes;
     }
+
     public String[] getOrientations() {
         return orientations;
     }
+
     public static String[] getProfiles() {
         File directory = new File("./ShinyBot/profiles/");
 
@@ -87,7 +107,6 @@ public class ShinyBotConfig extends Config {
         if (directory.isDirectory()) {
             // Use a FilenameFilter to filter .json files
             String[] jsonFiles = directory.list((dir, name) -> name.toLowerCase().endsWith(".json"));
-
 
             // Print the JSON filenames
             if (jsonFiles != null) {
@@ -114,6 +133,7 @@ public class ShinyBotConfig extends Config {
     public String getCurrentMode() {
         return modes[currentMode];
     }
+
     public void setCurrentMode(String currentMode) {
         for (int i = 0; i < modes.length; i++) {
             if (modes[i].equals(currentMode)) {
@@ -121,9 +141,11 @@ public class ShinyBotConfig extends Config {
             }
         }
     }
+
     public String getCurrentOrientation() {
         return orientations[currentOrientation];
     }
+
     public void setCurrentOrientation(String currentOrientation) {
         for (int i = 0; i < orientations.length; i++) {
             if (orientations[i].equals(currentOrientation)) {
@@ -131,76 +153,108 @@ public class ShinyBotConfig extends Config {
             }
         }
     }
+
     public int getGameSpeed() {
         return gameSpeed;
     }
+
     public void setGameSpeed(int gameSpeed) {
         this.gameSpeed = gameSpeed;
     }
+
     public boolean hasShinyCharm() {
         return hasShinyCharm;
     }
+
     public void setHasShinyCharm(boolean hasShinyCharm) {
         this.hasShinyCharm = hasShinyCharm;
     }
+
     public String getProfileName() {
         return profileName;
     }
+
     public void setProfileName(String profileName) {
         this.profileName = profileName;
     }
+
     public int getMinimumDelay() {
         return minimumDelay;
     }
+
     public void setMinimumDelay(int minimum) {
         this.minimumDelay = minimum;
     }
+
     public int[] getEncounterColor() {
         return encounterColor;
     }
+
     public void setEncounterColor(int red, int green, int blue) {
         encounterColor[0] = red;
         encounterColor[1] = green;
         encounterColor[2] = blue;
     }
+
     public void setSingleEncounterColor(String color, int value) {
         switch (color) {
-            case "red" ->  {
+            case "red" -> {
                 encounterColor[0] = value;
             }
-            case "green" ->  {
+            case "green" -> {
                 encounterColor[1] = value;
             }
-            case "blue" ->  {
+            case "blue" -> {
                 encounterColor[2] = value;
             }
         }
     }
+
     public int[] getBattleColor() {
         return battleColor;
     }
+
     public void setBattleColor(int red, int green, int blue) {
         battleColor[0] = red;
         battleColor[1] = green;
         battleColor[2] = blue;
     }
+
     public void setSingleBattleColor(String color, int value) {
         switch (color) {
-            case "red" ->  {
+            case "red" -> {
                 battleColor[0] = value;
             }
-            case "green" ->  {
+            case "green" -> {
                 battleColor[1] = value;
             }
-            case "blue" ->  {
+            case "blue" -> {
                 battleColor[2] = value;
             }
         }
     }
+
     public int getControllerNum() {
         return controllerNum;
     }
+
     public void setControllerNum(int controllerNum) {
         this.controllerNum = controllerNum;
+    }
+
+    public boolean isSavingPictures() {
+        return isSavingPictures;
+    }
+
+    public void setSavingPictures(boolean isSavingPictures) {
+        this.isSavingPictures = isSavingPictures;
+    }
+
+    public boolean isListening() {
+        return isListening;
+    }
+
+    public void setListening(boolean isListening) {
+        this.isListening = isListening;
     }
 }
